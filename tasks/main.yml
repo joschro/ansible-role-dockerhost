@@ -1,0 +1,59 @@
+---
+# tasks file for dockerhost
+
+- name: Upgrade all packages
+  yum: name=* state=latest
+  tags: packages
+
+- name: Install dockerhost specific packages
+  yum: name={{ item }} state=present
+  with_items:
+   - kbd
+   - vim
+   - parted
+   - bridge-utils
+   - chrony
+  tags: packages
+
+- name: Start the chrony service
+  service: name=chronyd state=started enabled=yes
+  tags: packages
+
+# enable Fedora 22 ARM repository providing the docker package
+- name: Install Fedora 22 repository
+  template: src=Fedora-Everything.repo dest=/etc/yum.repos.d/Fedora-Everything.repo
+  tags: packages
+
+- name: Import primary Fedora 22 GPG keys
+  rpm_key: state=present key=https://getfedora.org/static/8E1431D5.txt
+  tags: packages
+
+- name: Import secondary Fedora 22 GPG keys
+  rpm_key: state=present key=https://getfedora.org/static/A29CB19C.txt
+  tags: packages
+
+# install docker
+- name: Install docker from Fedora repository
+  yum: name={{ item }} enablerepo=fedora state=latest
+  with_items:
+   - docker
+  tags: packages
+
+# enable docker daemon
+- name: Enable and start docker service
+  service: name=docker state=started enabled=yes
+  tags: packages
+
+# resize root partition
+- name: Resize / partition
+  command: /usr/bin/touch /.rootfs-repartition
+  tags: partition
+
+# reboot system to make resized partition available
+- name: Reboot RedHat/CentOS 7 systems
+  shell: sleep 5 && shutdown -r now
+  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
+  async: 1
+  poll: 0
+  tags: partition
+  ignore_errors: yes
