@@ -69,4 +69,4 @@ GPLv3
 Author Information
 ------------------
 
-Joachim Schröder, jschrode@redhat.com
+Joachim Schröder, jos (at) redhat.com
