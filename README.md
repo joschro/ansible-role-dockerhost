@@ -48,7 +48,7 @@ None right now.
 Example Playbook
 ----------------
 ```
-- name: Deploy a docker host with integrated Wifi access point
+- name: Deploy a docker host
   hosts: dockerhosts
   remote_user: root
 
