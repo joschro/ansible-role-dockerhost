@@ -46,7 +46,7 @@
 
 # resize root partition
 - name: Resize / partition
-  command: /usr/bin/touch /.rootfs-repartition
+  file: path=/.rootfs-repartition state=touch
   tags: partition
 
 # reboot system to make resized partition available
